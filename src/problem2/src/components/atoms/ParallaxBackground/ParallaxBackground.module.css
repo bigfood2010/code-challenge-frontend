@@ -1,0 +1,48 @@
+.container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 15% 10%, #ffffff 0%, #f3f6fb 45%, #ebeff5 100%);
+}
+
+.staticAura {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: 
+    radial-gradient(circle at 85% 15%, #ffffffcf 0%, transparent 40%),
+    radial-gradient(circle at 10% 80%, #dbeafe6b 0%, transparent 45%);
+}
+
+.aura1 {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 50%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, transparent 70%);
+  filter: blur(80px);
+}
+
+.aura2 {
+  position: absolute;
+  bottom: -15%;
+  left: -5%;
+  width: 60%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(219, 234, 254, 0.4) 0%, transparent 70%);
+  filter: blur(100px);
+}
+
+.blob {
+  position: absolute;
+  top: 40%;
+  left: 30%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+  border-radius: 50%;
+  filter: blur(60px);
+}
