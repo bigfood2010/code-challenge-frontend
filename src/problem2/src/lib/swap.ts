@@ -8,6 +8,7 @@ export interface SwapSelection {
 export interface SwapQuote {
   rate: number;
   receiveAmount: number;
+  sendAmount: number;
 }
 
 const AMOUNT_PATTERN = /^[\d,]*\.?\d+$/;
@@ -99,10 +100,4 @@ export function buildSwapQuote(
     receiveAmount,
     sendAmount,
   };
-}
-
-export interface SwapQuote {
-  rate: number;
-  receiveAmount: number;
-  sendAmount: number;
 }

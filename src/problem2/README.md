@@ -1,3 +1,6 @@
+## Screenshot
+![Application Screenshot](./assets/screenshot.png)
+
 # Problem 2 - Run Guide
 
 ## Prerequisites

@@ -1,7 +1,6 @@
-// @ts-nocheck
-import { useMemo } from "react";
+import { useMemo, type ComponentType, type HTMLAttributes } from "react";
 
-type Blockchain = "Osmosis" | "Ethereum" | "Arbitrum" | "Zilliqa" | "Neo";
+type SupportedBlockchain = "Osmosis" | "Ethereum" | "Arbitrum" | "Zilliqa" | "Neo";
 
 interface WalletBalance {
   blockchain: string;
@@ -16,14 +15,14 @@ interface WalletRowProps {
   formattedAmount: string;
 }
 
-interface Props extends React.HTMLAttributes<HTMLDivElement> {}
+interface Props extends HTMLAttributes<HTMLDivElement> {}
 
 declare function useWalletBalances(): WalletBalance[];
 declare function usePrices(): Record<string, number | undefined>;
-declare const WalletRow: React.ComponentType<WalletRowProps>;
+declare const WalletRow: ComponentType<WalletRowProps>;
 declare const classes: { row: string };
 
-const BLOCKCHAIN_PRIORITY: Record<Blockchain, number> = {
+const BLOCKCHAIN_PRIORITY: Readonly<Record<SupportedBlockchain, number>> = {
   Osmosis: 100,
   Ethereum: 50,
   Arbitrum: 30,
@@ -31,49 +30,40 @@ const BLOCKCHAIN_PRIORITY: Record<Blockchain, number> = {
   Neo: 20,
 };
 
-function isBlockchain(value: string): value is Blockchain {
-  return value in BLOCKCHAIN_PRIORITY;
-}
-
 function getPriority(blockchain: string): number {
-  return isBlockchain(blockchain) ? BLOCKCHAIN_PRIORITY[blockchain] : -99;
+  return BLOCKCHAIN_PRIORITY[blockchain as SupportedBlockchain] ?? -99;
 }
 
-export const WalletPage: React.FC<Props> = (props) => {
+export function WalletPage(props: Props) {
   const balances = useWalletBalances();
   const prices = usePrices();
 
   const sortedBalances = useMemo(() => {
-    return balances
-      .filter((balance) => {
-        const priority = getPriority(balance.blockchain);
-        return priority > -99 && balance.amount > 0;
-      })
-      .sort((lhs, rhs) => {
-        const leftPriority = getPriority(lhs.blockchain);
-        const rightPriority = getPriority(rhs.blockchain);
-        if (leftPriority > rightPriority) return -1;
-        if (rightPriority > leftPriority) return 1;
-        return 0;
-      });
+    return [...balances]
+      .filter((balance) => getPriority(balance.blockchain) > -99 && balance.amount > 0)
+      .sort(
+        (left, right) =>
+          getPriority(right.blockchain) - getPriority(left.blockchain),
+      );
   }, [balances]);
 
-  const rows = useMemo(() => {
-    return sortedBalances.map((balance) => {
-      const price = prices[balance.currency] ?? 0;
-      const usdValue = price * balance.amount;
+  const walletRows = sortedBalances.map((balance) => {
+    const usdValue = (prices[balance.currency] ?? 0) * balance.amount;
 
-      return (
-        <WalletRow
-          className={classes.row}
-          key={`${balance.blockchain}-${balance.currency}`}
-          amount={balance.amount}
-          usdValue={usdValue}
-          formattedAmount={balance.amount.toFixed(6)}
-        />
-      );
-    });
-  }, [sortedBalances, prices]);
+    return (
+      <WalletRow
+        className={classes.row}
+        key={`${balance.blockchain}:${balance.currency}`}
+        amount={balance.amount}
+        usdValue={usdValue}
+        formattedAmount={balance.amount.toFixed(6)}
+      />
+    );
+  });
 
-  return <div {...props}>{rows}</div>;
-};
+  return (
+    <div {...props}>
+      {walletRows}
+    </div>
+  );
+}
